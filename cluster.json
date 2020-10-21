@@ -50,6 +50,14 @@
         "c" : 4,
         "mem" : 45000
     },
+     "normTracks" : 
+    {
+        "J" : "normTracks",
+        "o" : "logs/normTracks/normTracks%j.out",
+        "e" : "logs/normTracks/normTracks%j.err",
+        "c" : 16,
+        "mem" : 45000
+     },
      "bb2bed" :
     {
         "J" : "bb2bed",

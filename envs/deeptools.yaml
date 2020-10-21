@@ -1,0 +1,8 @@
+name: deeptools
+channels:
+  - bioconda
+  - defaults
+  - conda-forge
+dependencies:
+  - samtools=1.9
+  - deeptools=3.5.0

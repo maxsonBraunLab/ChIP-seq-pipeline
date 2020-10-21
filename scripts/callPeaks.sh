@@ -112,7 +112,7 @@ fi
 
 # Created output directory if it does not already exist
 if [ ! -d "${WDIR}/${outDir}" ]; then
-    mkdir ${WDIR}/${outDir}
+    mkdir -p ${WDIR}/${outDir}
 fi
 
 ###############################################################################
@@ -120,7 +120,8 @@ fi
 ###############################################################################
 
 if [ "$peak" == "narrow" ]; then
-    macs2 callpeak -t ${WDIR}/${treated} -c ${WDIR}/${control} -n $sample --outdir $TMP -g $gsize 
+    macs2 callpeak -t ${WDIR}/${treated} -c ${WDIR}/${control} -n $sample --outdir $TMP -g $gsize
+    cp -r $TMP/* ${WDIR}/samples/macs/${sample}
 elif [ "$peak" == "broad" ]; then
     SICER.sh ${WDIR}/${inputDir} $basenameTreat $basenameControl $TMP $assembly 1 200 150 0.8 600 1e-8 
 fi

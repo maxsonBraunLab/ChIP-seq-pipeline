@@ -1,14 +1,47 @@
+# read alignment + project bg ---------------------------------------------------
 assembly:
   hg38
 filter:
   0
 project_id:
-  ChIP-seq-12-06-2018
+  "tbr1"
 seq_type:
-  SE
+  PE
 bed_tool:
   /home/groups/CEDAR/tools/kentUtils/bigBedToBed
 samples:
-  /home/groups/CEDAR/roskamsh/projects/ChIP-seq-pipeline/data/ChIP_metadata.txt
+  config/metadata.txt
+# set extension if using single end reads, otherwise 0 for PE reads.
 extension:
-  150
+  0
+# consensus peaks -------------------------------------------------------------
+blacklist:
+  "/home/groups/MaxsonLab/indices/GRch38/hg38.blacklist.v2.bed"
+# keep peaks present in "n_intersects" (int) numbers of replicates
+n_intersects:
+  2
+
+# deseq2 ----------------------------------------------------------------------
+contrasts: "config/contrasts.txt"
+
+linear_model:
+  ~ Condition + Factor
+
+pca_labels:
+  - Condition
+  - Factor
+
+diffexp:
+  # baseline-vs-contrast:
+  #   - contrast
+  #   - baseline
+  control-vs-case:
+    - case
+    - control
+  dmso-vs-gsk:
+    - gsk
+    - dmso
+
+# chip screen + fisher --------------------------------------------------------
+chrom_sizes:
+  /home/groups/MaxsonLab/indices/GRch38/hg38.chrom.sizes

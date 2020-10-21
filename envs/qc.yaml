@@ -1,0 +1,6 @@
+name: qc
+channels:
+  - bioconda
+  - default
+  - anaconda
+dependencies:

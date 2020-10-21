@@ -192,10 +192,20 @@ if [ "$type" == "SE" ]; then
     rm ${TMP}/${sample}.trimmed.fq
 elif [ "$type" == "PE" ]; then
     bowtie -p $USE -q -X $gap -v $nrMM -m 1 --best --strata $INDEX -1 ${TMP}/${sample}.read_1.trimmed.fq -2 ${TMP}/${sample}.read_2.trimmed.fq > ${TMP}/${sample}.reads.bowtie 2>> $TMP/LOG.log
+    # new: save output as sam file, copy output to samples/bams, sort, save as bam
+    bowtie -S -p $USE -q -X $gap -v $nrMM -m 1 --best --strata $INDEX -1 ${TMP}/${sample}.read_1.trimmed.fq -2 ${TMP}/${sample}.read_2.trimmed.fq > ${TMP}/${sample}.sam 2>> $TMP/LOG.log
+    cp ${TMP}/${sample}.sam samples/bams
+    samtools view -@ ${USE} -bS samples/bams/${sample}.sam > samples/bams/${sample}.bam
+    samtools sort samples/bams/${sample}.bam -@ 4 -m 4G > samples/bams/${sample}.sorted.bam
+    samtools index samples/bams/${sample}.sorted.bam
+    # rm files in tmp space + unsorted bam
+    rm ${TMP}/${sample}.sam
+    rm samples/bams/${sample}.bam
+    rm samples/bams/${sample}.sam
+    # end new
     rm ${TMP}/${sample}.read_1.trimmed.fq ${TMP}/${sample}.read_2.trimmed.fq
 fi
-#-q ensures fastq input/output
-
+# -q ensures fastq input/output
 
 ################################################################################
 # Convert output to BED and sort
