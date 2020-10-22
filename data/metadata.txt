@@ -1,2 +1,0 @@
-SampleID	Control	Peak_call
-sample1	samples/bed/control.bed	narrow
