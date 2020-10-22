@@ -1,47 +1,32 @@
 # read alignment + project bg ---------------------------------------------------
-assembly:
-  hg38
-filter:
-  0
-project_id:
-  "tbr1"
-seq_type:
-  PE
-bed_tool:
-  /home/groups/CEDAR/tools/kentUtils/bigBedToBed
-samples:
-  config/metadata.txt
+assembly: hg38
+filter: 0
+project_id: "tbr1"
+seq_type: PE
+bed_tool: /home/groups/CEDAR/tools/kentUtils/bigBedToBed
+samples: config/metadata.txt
 # set extension if using single end reads, otherwise 0 for PE reads.
-extension:
-  0
+extension: 0
 # consensus peaks -------------------------------------------------------------
-blacklist:
-  "/home/groups/MaxsonLab/indices/GRch38/hg38.blacklist.v2.bed"
+blacklist: /home/groups/MaxsonLab/indices/GRch38/hg38.blacklist.v2.bed
 # keep peaks present in "n_intersects" (int) numbers of replicates
-n_intersects:
-  2
+n_intersects: 2
+
+# quality control -------------------------------------------------------------
+# fastqc_screen
+fastq_screen_conf: config/fastq_screen.conf
+
+# deeptools computeMatrix: number of bp before and after gene coordinates to investigate binding profiles
+genome_gtf: /home/groups/MaxsonLab/indices/GRch38/Homo_sapiens.GRCh38.101.gtf.gz
+before_region: 3000
+after_region: 3000
 
 # deseq2 ----------------------------------------------------------------------
 contrasts: "config/contrasts.txt"
 
+# linear model per factor. Generally doesn't need to be changed.
 linear_model:
-  ~ Condition + Factor
-
-pca_labels:
-  - Condition
-  - Factor
-
-diffexp:
-  # baseline-vs-contrast:
-  #   - contrast
-  #   - baseline
-  control-vs-case:
-    - case
-    - control
-  dmso-vs-gsk:
-    - gsk
-    - dmso
+  ~ Condition
 
 # chip screen + fisher --------------------------------------------------------
-chrom_sizes:
-  /home/groups/MaxsonLab/indices/GRch38/hg38.chrom.sizes
+chrom_sizes: /home/groups/MaxsonLab/indices/GRch38/hg38.chrom.sizes

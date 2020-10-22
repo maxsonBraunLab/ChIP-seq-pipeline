@@ -21,8 +21,13 @@ contrasts = pd.read_csv(config['contrasts'], sep = "\t")
 
 if config["seq_type"]=="SE":
     CASES, = glob_wildcards("samples/cases/{sample}.fastq.gz")
+    COND_REPS, FACTORS, = glob_wildcards("samples/cases/{cond_rep}_{factor}.fastq.gz")
 else:
     CASES, = glob_wildcards("samples/cases/{sample}_R1.fastq.gz")
+    COND_REPS, FACTORS, = glob_wildcards("samples/cases/{cond_rep}_{factor}_R1.fastq.gz")
+# CASES glob for "{cond}{rep}_{factor}"
+# COND_REPS glob for "{cond}{rep}" only
+# FACTORS glob for "{factor}" only
 
 if config["seq_type"]=="SE":
     CONTROLS, = glob_wildcards("samples/controls/{sample}.fastq.gz")
@@ -30,6 +35,7 @@ else:
     CONTROLS, = glob_wildcards("samples/controls/{sample}_R1.fastq.gz")
 CASES = sorted(CASES)
 CONTROLS = sorted(CONTROLS)
+COND_REPS = sorted(set(COND_REPS))
 
 ## multiple samples may use the same control input/IgG files
 CONTROLS_UNIQUE = list(set(CONTROLS))
@@ -65,7 +71,7 @@ DB, CELL_LINE, FILE, = glob_wildcards("/home/groups/MaxsonLab/kongg/chip_seq/dat
 
 # snakemake -j 64 --use-conda --rerun-incomplete --latency-wait 60 --keep-going --cluster-config cluster.json --cluster "sbatch -p {cluster.partition} -N {cluster.N} -o {cluster.o} -e {cluster.e} -t {cluster.t} -J {cluster.J} -c {cluster.c} --mem={cluster.mem}" -s Snakefile
 
-# snakemake -j 64 --use-conda --rerun-incomplete --latency-wait 60 --keep-going --profile slurm --cluster-config cluster2.json
+# snakemake -j 99 --use-conda --rerun-incomplete --latency-wait 60 --keep-going --profile slurm --cluster-config cluster2.json
 
 localrules: frip_plot, consensus_peaks, merge_counts
 
@@ -80,22 +86,28 @@ rule all:
         # pre-DESeq2 = consensus peaks + counts table
         "samples/macs/all_peaks.bed",
         expand("samples/macs/{factor}_peaks.bed", factor = FACTORS),
-        expand("data/{factor}_counts.txt", factor = FACTORS),
-        # DESeq2 = pca + analyze contrasts
-        # "data/de/all_pca.png",
-        # expand("data/de/{factor}.png", factor = FACTORS),
+        expand("results/counts/{factor}_counts.txt", factor = FACTORS),
+        # DESeq2 = pca + normalized counts + analyze contrasts
+        expand("results/de/pca/{factor}.png", factor = FACTORS),
+        expand(["results/de/{factor}/{factor}_deseq2_norm_counts.txt",
+                "results/de/{factor}/{factor}_deseq2_lognorm_counts.txt"], factor = FACTORS),
+        directory(expand("results/de/{factor}", factor = FACTORS)),
         # quality control = frip + fastqc-screen + dispersion of coverage + library complexity + duplicate rate
-        "data/qc/frip.html"
-        # downstream = chip_screen + chip_fisher
+        expand("results/qc/plotHeatmap/{factor}_all_samples.png", factor = FACTORS),
+        expand(["samples/qc/fastq_screen/{cases}/{cases}_{dir}_screen.{ext}",
+                "samples/qc/fastq_screen/{controls}/{controls}_{dir}_screen.{ext}"],
+                dir = ["R1", "R2"],
+                cases = CASES,
+                controls = CONTROLS_UNIQUE,
+                ext = ["png", "txt", "html"]),
+        expand("samples/qc/{factor}_fingerprint.png", factor = FACTORS),
+        "results/qc/frip.html",
 
-# miscellaneous rules
-        # expand("samples/norm_bigwig/counts/{sample}.txt", sample = SAMPLES),
-        # "samples/norm_bigwig/scaling_factors.txt",
-        # diffexp = pca + DESeq2 with contrasts
-        # chip screen - intersect consensus peaks with public chip data
-        # expand(["data/chip_screen/{db}/{cell_line}/consensus_peaks_{file}.bed.gz",
-        #         "data/chip_screen/{db}/{cell_line}/consensus_peaks_{file}.out"], 
-        #         zip, db = DB, cell_line = CELL_LINE, file = FILE)
+# downstream = chip_screen + chip_fisher
+# chip screen - intersect consensus peaks with public chip data
+# expand(["data/chip_screen/{db}/{cell_line}/consensus_peaks_{file}.bed.gz",
+#         "data/chip_screen/{db}/{cell_line}/consensus_peaks_{file}.out"], 
+#         zip, db = DB, cell_line = CELL_LINE, file = FILE)
 
 include: "rules/align.smk"
 include: "rules/peaks.smk"

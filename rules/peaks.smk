@@ -71,7 +71,7 @@ rule merge_counts:
     input:
         expand("samples/macs/counts/{sample}_{{factor}}.txt", sample = sample_rep)
     output:
-        "data/{factor}_counts.txt"
+        "results/counts/{factor}_counts.txt"
     run:
         dataframes = []
         for file in input:

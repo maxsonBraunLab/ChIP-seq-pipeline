@@ -1,30 +1,35 @@
-# pca of all samples * conds * factor and pca per factor
-rule deseq2_pca:
+# for each factor input, apply DESeq2 on Conditions + PCA output.
+rule deseq2_plots:
 	input:
-		catalog = "data/counts_table.txt",
+		catalog = "results/counts/{factor}_counts.txt",
 		contrasts = "config/contrasts.txt"
 	output:
-		all_pca = "data/de/all_pca.png",
-		mark_pca = expand("data/de/{factor}.png", factor = set(contrasts.Factor))
+		factor_pca = "results/de/plots/{factor}_pca.png",
+		factor_ma = "results/de/plots/{factor}_ma.png"
 	params:
-		linear_model = config['linear_model']
+		factor = "{factor}"
 	conda:
 		"../envs/deseq2.yaml"
-	threads: 8
+	threads: 2
 	script:
 		"../scripts/deseq2_pca.R"
 
-rule deseq2:
+rule deseq2_pairwise:
 	input:
-		catalog = "data/counts_table.txt",
+		catalog = "results/counts/{factor}_counts.txt",
 		contrasts = "config/contrasts.txt"
 	output:
-		# pca and ma plots
-		"data/de/{mark}/{case}_{control}_upregulate.txt",
-		"data/de/{mark}/{case}_{control}_downregulate.txt",
+		# deseq2-normalized counts
+		normCounts = "results/de/{factor}/{factor}_deseq2_norm_counts.txt",
+		lnormCounts = "results/de/{factor}/{factor}_deseq2_lognorm_counts.txt",
+		# differential peaks + gene ontology + ma plots
+		d = directory("results/de/{factor}")
 	params:
-		linear_model = config['linear_model']
+		linear_model = config['linear_model'],
+		factor = "{factor}"
 	conda:
 		"../envs/deseq2.yaml"
+	threads: 4
+	log: "logs/deseq2_pairwise/{factor}.log"
 	script:
 		"../scripts/deseq2_pairwise.R"
