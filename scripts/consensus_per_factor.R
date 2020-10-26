@@ -13,7 +13,6 @@ args = commandArgs(trailingOnly=TRUE)
 np_file <- args[1]
 blacklist_file <- args[2]
 presence_in_samples <- as.numeric(args[3]) # e.g. 2
-#genome_name <- "hg38"
 genome_name <- args[4]
 
 #This command reads in the merged broadnarrowpeak files and adds the information about the genome
@@ -23,9 +22,9 @@ peaks <- fread(np_file)
 
 #lets load the peaks file, define cond and factor from name column, and convert it to a granges object
 colnames(peaks) <- c("seqnames", "start", "end", "name", "score", "no_strand", "signalValue", "pValue","qvalue", "peak")
-peaks <- peaks %>% 
-	separate(name, into = c("cond", "factor"), sep = "_", remove = FALSE, extra = "drop") %>% 
-	mutate(cond = str_sub(cond, end = -2))
+peaks <- peaks %>%
+	separate(name, into = c("rep", "factor"), sep = "_", remove = FALSE, extra = "drop") %>% 
+	mutate(cond = str_sub(rep, end = -2))
 peaks <- as_granges(peaks) %>% set_genome_info(genome = genome_name)
 
 
@@ -92,19 +91,21 @@ if (genome_name == "hg38") {
 # for each factor and for each condition (cond), find peaks that appear in presence_in_samples number of replicates.
 Factors <- unique(filtered_peaks$factor)
 
+stats_catalog <- data.frame()
+
 for (f in Factors) {
 	# given all peaks, subset by factor, split by condition, count no. of overlaps between peaks per reps
-	temp_catalog <- data.frame() # consensus peaks, refreshed per factor.
 	outfile <- paste0('samples/macs/', f, '_peaks.bed')
 	print(paste("Finding consensus peak in >=", presence_in_samples, "number of replicates from factor", f))
 	temp_df <- filtered_peaks %>% filter(factor == f)
-	temp_split <- temp_df %>% split(., temp_df$cond)
+	temp_split <- temp_df %>% split(., temp_df$cond) # split factor by conditions
 	seqlengths(temp_split) <- sl
 	temp_split <- lapply(temp_split, function(x) {
 			compute_coverage(x) %>% 
 			filter(score >= presence_in_samples) %>% 
 			reduce_ranges() %>% 
-			filter_by_non_overlaps(blacklist)}) %>% GRangesList()
+			filter_by_non_overlaps(blacklist)
+			}) %>% GRangesList()
 	# print message if no overlaps in at least one cond.
 	if (any(unlist( lapply(temp_split, length) ) == 0 )) {
 		message("Factor ", f, " has no consensus peaks within a condition.")
@@ -114,4 +115,30 @@ for (f in Factors) {
 	consensus_per_factor <- unlist(temp_split) %>% reduce_ranges()
 	consensus_per_factor <- consensus_per_factor %>% as.data.frame() %>% mutate(name = paste0(f, "_peak_",row_number())) %>% as_granges()
 	write_bed(consensus_per_factor, outfile)
+
+
+	# write consensus statistics over all replicates.
+	rep_split <- temp_df %>% split(., temp_df$rep)
+	stats_list <- lapply(rep_split, function(x) {
+		replicate <- toString(unique(x$rep))
+		condition <- unique(x$cond)
+		peaks_in_replicate <- as.integer(nrow(as.data.frame(x)))
+		peaks_in_consensus <- nrow(as.data.frame(  join_overlap_inner(x, consensus_per_factor)  ))
+		peaks_in_consensus_over_peaks_in_consensus <- peaks_in_consensus / peaks_in_replicate
+		number_consensus_peaks <- nrow(as.data.frame(consensus_per_factor))
+		temp_stats <- data.frame(
+			factor=f,
+			cond=condition,
+			rep=replicate,
+			tot_peaks=peaks_in_replicate,
+			peaks_in_consensus=peaks_in_consensus,
+			prop_consensus_peaks_in_tot_peaks=peaks_in_consensus_over_peaks_in_consensus,
+			tot_consensus_peaks=number_consensus_peaks)
+	})
+	stats_per_factor <- do.call(rbind, stats_list)
+	stats_catalog <- rbind(stats_catalog, stats_per_factor)
 }
+
+print("Consensus statistics")
+print(stats_catalog)
+fwrite(stats_catalog, "samples/macs/consensus_stats.txt", sep = "\t", quote = FALSE, )
