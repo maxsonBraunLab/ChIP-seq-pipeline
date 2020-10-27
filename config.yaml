@@ -1,7 +1,7 @@
 # read alignment + project bg ---------------------------------------------------
-assembly: hg38
+assembly: hg38 # ['hg38', 'mm10']
 filter: 0
-project_id: "tbr1"
+project_id: tbr1
 seq_type: PE
 bed_tool: /home/groups/CEDAR/tools/kentUtils/bigBedToBed
 samples: config/metadata.txt
@@ -23,6 +23,7 @@ after_region: 3000
 
 # deseq2 ----------------------------------------------------------------------
 contrasts: "config/contrasts.txt"
+significance: 0.05
 
 # linear model per factor. Generally doesn't need to be changed.
 linear_model:
