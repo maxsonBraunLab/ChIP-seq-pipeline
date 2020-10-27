@@ -4,7 +4,8 @@ rule mapReads_paired_cases:
         R2 = "samples/cases/{sample}_R2.fastq.gz"
     output:
         "samples/bigBed/{sample}.all.bb",
-        "samples/bams/{sample}.sorted.bam",
+        temp("samples/bams/{sample}.sorted.bam"),
+        temp("samples/bams/{sample}.sorted.bam.bai")
     params:
         assembly = config["assembly"],
         filter = config["filter"],
@@ -21,7 +22,8 @@ rule mapReads_paired_controls:
         R2 = "samples/controls/{sample}_R2.fastq.gz"
     output:
         "samples/bigBed/{sample}.all.bb",
-        "samples/bams/{sample}.sorted.bam",
+        temp("samples/bams/{sample}.sorted.bam"),
+        temp("samples/bams/{sample}.sorted.bam.bai")
     params:
         assembly = config["assembly"],
         filter = config["filter"],
@@ -76,3 +78,27 @@ rule makeTracks:
         "../envs/chip.yaml"
     shell:
         """scripts/makeTracks.sh -i {input} -o {output} -g {params.assembly} -e {params.ext}"""
+
+rule markdup:
+    input:
+        "samples/bams/{sample}.sorted.bam"
+    output:
+        temp("samples/bams/{sample}.dedup.sorted.bam"),
+        temp("samples/bams/{sample}.dedup.sorted.bam.bai")
+    conda:
+        "../envs/sambamba.yaml"
+    log:
+        "logs/markdup/{sample}.log"
+    threads: 8
+    shell:
+        "sambamba markdup -r -t {threads} {input} {output}"
+
+rule rm_unmapped:
+    input:
+        rules.markdup.output
+    output:
+        "samples/bams/{sample}.mapped.dedup.sorted.bam"
+    conda:
+        "../envs/chip.yaml"
+    shell:
+        """samtools view -h {input} | awk '{{  if ($3 != "*") {{print $0}}  }}' | samtools view -bS > {output}; samtools index {output}"""

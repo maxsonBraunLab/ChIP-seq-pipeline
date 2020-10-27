@@ -5,7 +5,7 @@ rule deseq2_plots:
 		contrasts = "config/contrasts.txt"
 	output:
 		factor_pca = "results/de/plots/{factor}_pca.png",
-		factor_ma = "results/de/plots/{factor}_ma.png"
+		# factor_ma = "results/de/plots/{factor}_ma.png"
 	params:
 		factor = "{factor}"
 	conda:
@@ -22,11 +22,12 @@ rule deseq2_pairwise:
 		# deseq2-normalized counts
 		normCounts = "results/de/{factor}/{factor}_deseq2_norm_counts.txt",
 		lnormCounts = "results/de/{factor}/{factor}_deseq2_lognorm_counts.txt",
-		# differential peaks + gene ontology + ma plots
+		# differential peaks (contains DE, up, down, and regions).
 		d = directory("results/de/{factor}")
 	params:
 		linear_model = config['linear_model'],
-		factor = "{factor}"
+		factor = "{factor}",
+		significance = config["significance"]
 	conda:
 		"../envs/deseq2.yaml"
 	threads: 4

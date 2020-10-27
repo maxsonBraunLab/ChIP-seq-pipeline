@@ -36,7 +36,8 @@ rule consensus_peaks:
         expand("samples/macs/{sample}/{sample}_peaks.narrowPeak", sample = CASES)
     output:
         all_peaks = "samples/macs/all_peaks.bed",
-        consensus_per_factor = expand("samples/macs/{factor}_peaks.bed", factor = FACTORS)
+        consensus_per_factor = expand("samples/macs/{factor}_peaks.bed", factor = FACTORS),
+        consensus_stats = "samples/macs/consensus_stats.txt"
     params:
         present_in_number = config["n_intersects"],
         blacklist = config["blacklist"],
@@ -54,7 +55,7 @@ rule consensus_peaks:
 
 rule sample_counts:
     input:
-        bams = "samples/bams/{sample}_{factor}.sorted.bam",
+        bams = "samples/bams/{sample}_{factor}.mapped.dedup.sorted.bam",
         peaks = "samples/macs/{factor}_peaks.bed"
     output:
         "samples/macs/counts/{sample}_{factor}.txt"
@@ -65,11 +66,11 @@ rule sample_counts:
     shell:
         "bedtools multicov -bams {input.bams} -bed {input.peaks} > {output}; sed -i '1i {params.header}' {output}"
 
-sample_rep = sorted(set( [i.split("_")[0] for i in CASES] )) # print out {cond}{rep} of samples
+# sample_rep = sorted(set( [i.split("_")[0] for i in CASES] )) # print out {cond}{rep} of samples
 
 rule merge_counts:
     input:
-        expand("samples/macs/counts/{sample}_{{factor}}.txt", sample = sample_rep)
+        expand("samples/macs/counts/{sample}_{{factor}}.txt", sample = COND_REPS)
     output:
         "results/counts/{factor}_counts.txt"
     run:

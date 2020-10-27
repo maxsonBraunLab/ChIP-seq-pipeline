@@ -46,14 +46,35 @@ rule fastq_screen_controls:
 		"fastq_screen --aligner bowtie2 --threads {threads} --conf {params.conf} --outdir {params.outdir} {input.r1} {input.r2}"
 
 # library complexity
+rule preseq:
+	input:
+		"samples/bams/{sample}.mapped.dedup.sorted.bam"
+	output:
+		"samples/qc/preseq/preseq_{sample}.txt"
+	conda:
+		"../envs/preseq.yaml"
+	log:
+		"logs/preseq/{sample}.log"
+	shell:
+		"preseq c_curve -B -P -o {output} {input} > {log} 2>&1"
 
-# deduplication rate
+rule preseq_lcextrap:
+	input:
+		"samples/bams/{sample}.mapped.dedup.sorted.bam"
+	output:
+		"samples/qc/preseq/lcextrap_{sample}.txt"
+	conda:
+		"../envs/preseq.yaml"
+	log:
+		"logs/preseq_lcextrap/{sample}.log"
+	shell:
+		"preseq lc_extrap -B -P -e 1000000000 -o {output} {input} > {log} 2>&1"
 
 # post-alignment QC -----------------------------------------------------
 rule frip_count:
 	input:
-		bam = "samples/bams/{sample}.sorted.bam",
-		peaks = "samples/macs/{sample}_peaks.narrowPeak"
+		bam = "samples/bams/{sample}.mapped.dedup.sorted.bam",
+		peaks = "samples/macs/{sample}/{sample}_peaks.narrowPeak"
 	output:
 		"samples/qc/frip/{sample}_stats.txt"
 	conda:
@@ -86,9 +107,13 @@ rule frip_plot:
 			xaxis=dict(title='Samples'))
 		fig.write_html(str(output))
 
+def get_control_bam(wildcards):
+    return md.loc[(wildcards.sample),["Control_bam"]]
+
 rule plotFingerprint_factor:
 	input:
-		bam = expand("samples/bams/{sample}_{{factor}}.sorted.bam", sample = COND_REPS),
+		bam = "samples/bams/{sample}.mapped.dedup.sorted.bam",
+		control = get_control_bam,
 		bl = config["blacklist"]
 	output:
 		"samples/qc/{factor}_fingerprint.png"
@@ -96,7 +121,7 @@ rule plotFingerprint_factor:
 		"../envs/deeptools.yaml"
 	threads: 8
 	shell:
-		"plotFingerprint -b {input.bam} -o {output} -bl {input.bl} --smartLabels -p {threads}"
+		"plotFingerprint -b {input.bam} {input.control} -o {output} -bl {input.bl} --smartLabels -p {threads}"
 
 rule computeMatrix_factor:
 	input:
@@ -104,17 +129,18 @@ rule computeMatrix_factor:
 		r = "samples/macs/{factor}_peaks.bed",
 		bl = config["blacklist"]
 	output:
-		"samples/qc/computeMatrix_factor/{factor}_matrix.gz"
+		gz = "samples/qc/computeMatrix_factor/{factor}_matrix.gz",
+		matx = "samples/qc/computeMatrix_factor/{factor}_matrix.txt"
 	params:
 		before = config["before_region"],
 		after = config["after_region"],
 	conda:
 		"../envs/deeptools.yaml"
-	threads: 8
+	threads: 16
 	shell:
 		"computeMatrix reference-point -S {input.bw} -R {input.r} \
 		-a {params.after} -b {params.before} \
-		-bl {input.bl} -p {threads} --smartLabels -o {output}"
+		-bl {input.bl} -p {threads} --smartLabels -o {output.gz} --outFileNameMatrix {output.matx}"
 
 rule plotHeatmap_factor:
 	input:
