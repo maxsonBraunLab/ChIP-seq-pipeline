@@ -47,10 +47,11 @@ rule consensus_peaks:
         "../envs/consensus_peaks.yaml"
     log:
         "logs/consensus_peaks/{}.log".format(timestamp)
+    threads: 8
     shell:
         """
         cat {input} > {output.all_peaks}
-        Rscript --vanilla {params.script_file} {output.all_peaks} {params.blacklist} {params.present_in_number} {params.genome}
+        Rscript --vanilla {params.script_file} {output.all_peaks} {params.blacklist} {params.present_in_number} {params.genome} {threads}
         """
 
 rule sample_counts:
@@ -65,8 +66,6 @@ rule sample_counts:
         "../envs/chip.yaml"
     shell:
         "bedtools multicov -bams {input.bams} -bed {input.peaks} > {output}; sed -i '1i {params.header}' {output}"
-
-# sample_rep = sorted(set( [i.split("_")[0] for i in CASES] )) # print out {cond}{rep} of samples
 
 rule merge_counts:
     input:

@@ -4,8 +4,7 @@ rule deseq2_plots:
 		catalog = "results/counts/{factor}_counts.txt",
 		contrasts = "config/contrasts.txt"
 	output:
-		factor_pca = "results/de/plots/{factor}_pca.png",
-		# factor_ma = "results/de/plots/{factor}_ma.png"
+		factor_pca = "results/de/plots/{factor}_pca.png"
 	params:
 		factor = "{factor}"
 	conda:
@@ -19,18 +18,31 @@ rule deseq2_pairwise:
 		catalog = "results/counts/{factor}_counts.txt",
 		contrasts = "config/contrasts.txt"
 	output:
+		directory("results/de/{factor}"),
 		# deseq2-normalized counts
 		normCounts = "results/de/{factor}/{factor}_deseq2_norm_counts.txt",
 		lnormCounts = "results/de/{factor}/{factor}_deseq2_lognorm_counts.txt",
 		# differential peaks (contains DE, up, down, and regions).
-		d = directory("results/de/{factor}")
+		stats = temp("results/de/{factor}_stats.txt"),
+		all_sig_intervals = "results/de/{factor}/{factor}_sig_intervals.bed"
 	params:
 		linear_model = config['linear_model'],
 		factor = "{factor}",
 		significance = config["significance"]
 	conda:
 		"../envs/deseq2.yaml"
+	log: 
+		"logs/deseq2_pairwise/{factor}.log"
 	threads: 4
-	log: "logs/deseq2_pairwise/{factor}.log"
 	script:
 		"../scripts/deseq2_pairwise.R"
+
+rule de_stats:
+	input:
+		expand("results/de/{factor}_stats.txt", factor = FACTORS)
+	output:
+		"results/de/de_stats.txt"
+	params:
+		header = "\t".join(['factor', 'cond1', 'cond2', 'tot_peaks', 'sig_peaks', 'sig_up', 'sig_down'])
+	shell:
+		"cat {input} | sort > {output}; sed -i '1i {params.header}' {output}"

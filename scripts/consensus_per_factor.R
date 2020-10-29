@@ -6,6 +6,8 @@ library(purrr)
 library(GenomicRanges)
 library(tidyr)
 library(data.table)
+library(Rsamtools)
+library(parallel)
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -14,6 +16,9 @@ np_file <- args[1]
 blacklist_file <- args[2]
 presence_in_samples <- as.numeric(args[3]) # e.g. 2
 genome_name <- args[4]
+threads <- as.integer(args[5])
+
+options(srapply_fapply="parallel", mc.cores = threads)
 
 #This command reads in the merged broadnarrowpeak files and adds the information about the genome
 #we used 
@@ -132,12 +137,32 @@ for (f in Factors) {
 			rep=replicate,
 			tot_peaks=peaks_in_replicate,
 			peaks_in_consensus=peaks_in_consensus,
-			prop_consensus_peaks_in_tot_peaks=peaks_in_consensus_over_peaks_in_consensus,
+			# prop_consensus_peaks_in_tot_peaks=peaks_in_consensus_over_peaks_in_consensus,
 			tot_consensus_peaks=number_consensus_peaks)
 	})
 	stats_per_factor <- do.call(rbind, stats_list)
 	stats_catalog <- rbind(stats_catalog, stats_per_factor)
 }
+
+# collect fraction of reads in consensus catalog (FRCC) per rep per factor.
+for (i in 1:nrow(stats_catalog)) {
+	# define input files
+	factor <- stats_catalog[i, "factor"]
+	rep <- stats_catalog[i, "rep"]
+	print(paste("Determining FRCC for", rep, "with factor", factor))
+	in_regions <- fread(paste0('samples/macs/', factor, '_peaks.bed'))
+	in_file <- paste0("samples/bams/", rep, "_", factor, ".mapped.dedup.sorted.bam")
+	bamFile <- BamFile(in_file)
+
+	# count reads in consensus intervals & total reads
+	gr <- GRanges( seqnames = in_regions$V1, ranges = IRanges(start = c(in_regions$V2), end = c(in_regions$V3)) )
+	counted <- countBam(bamFile, param = ScanBamParam(which = gr, what=scanBamWhat()))
+	reads_in_cc <- sum(counted$records)
+	total_reads <- countBam(bamFile, param = ScanBamParam(what = "qname"))$records
+	frcc <- reads_in_cc / total_reads * 100
+	stats_catalog[i, "%_reads_in_CC"] = frcc
+}
+
 
 print("Consensus statistics")
 print(stats_catalog)
