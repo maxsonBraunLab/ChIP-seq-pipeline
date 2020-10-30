@@ -1,0 +1,91 @@
+---
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    number_sections: true 
+    code_folding: hide
+    toc: true
+    toc_float: false
+    smooth_scroll: true
+---
+
+```{r echo=FALSE, warning = FALSE, error = FALSE ,message = FALSE}
+library(rmarkdown)
+library(tidyverse)
+library(DT)
+doc_title <- snakemake@params[["title"]]
+author_list <- snakemake@params[["authors"]]
+author_list <- paste(author_list, collapse = ", ")
+knitr::opts_chunk$set(warning = FALSE, # do not output warning messages
+                      error = FALSE, # do not output error messages
+                      echo = FALSE, # don't show code in report.
+                      fig.width = 16, # set all figures to be 16 inches wide
+                      fig.height = 9, # set all figures to be 9 inches tall
+                      fig.align = 'center') # center align all figures
+```
+
+---
+# title and author variables must be defined first.
+title: "`r doc_title`"
+author: "`r author_list`"
+---
+
+# Intro
+`r snakemake@params[["intro"]]`
+
+# Analysis
+```{r results='asis'}
+for (i in snakemake@params[["analysis"]]) {
+	cat(paste("*", i, "\n"))
+}
+```
+
+# Takeaways
+```{r results='asis'}
+for (i in snakemake@params[["takeaways"]]) {
+	cat(paste("*", i, "\n"))
+}
+```
+
+# Notes
+`r snakemake@params[["notes"]]`
+
+# Key metrics
+
+## Alignment statistics
+Insert alignment statistics table here.
+
+## Peak calling
+Below is the configuration file to call peaks on case and controls.
+```{r}
+peak_md <- read.table(snakemake@params[["peak_md"]], header = T)
+datatable(peak_md)
+```
+
+## Consensus peaks
+The consensus peaks scheme is to find peaks that appear in 100% of replicates in at least one condition.
+```{r}
+consensus_stats <- read.table(snakemake@input[["consensus_stats"]], header = TRUE)
+colnames(consensus_stats)[[7]] <- "%_reads_in_CC"
+datatable(consensus_stats)
+```
+
+## Differential summary
+
+### DE config
+
+```{r}
+contrasts <- read.table(snakemake@params[["contrasts"]], header = TRUE)
+datatable(contrasts)
+```
+
+### DE stats
+
+```{r}
+de_stats <- read.table(snakemake@input[["de_stats"]], header = TRUE)
+datatable(de_stats)
+```
+
+```{r}
+save.image()
+```

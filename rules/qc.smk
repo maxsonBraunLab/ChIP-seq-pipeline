@@ -6,15 +6,15 @@ rule fastq_screen_cases:
 		r1 = "samples/cases/{sample}_R1.fastq.gz",
 		r2 = "samples/cases/{sample}_R2.fastq.gz"
 	output:
-		"samples/qc/fastq_screen/{sample}/{sample}_R1_screen.txt",
-		"samples/qc/fastq_screen/{sample}/{sample}_R1_screen.png",
-		"samples/qc/fastq_screen/{sample}/{sample}_R1_screen.html",
-		"samples/qc/fastq_screen/{sample}/{sample}_R2_screen.txt",
-		"samples/qc/fastq_screen/{sample}/{sample}_R2_screen.png",
-		"samples/qc/fastq_screen/{sample}/{sample}_R2_screen.html"
+		"results/qc/fastq_screen/{sample}/{sample}_R1_screen.txt",
+		"results/qc/fastq_screen/{sample}/{sample}_R1_screen.png",
+		"results/qc/fastq_screen/{sample}/{sample}_R1_screen.html",
+		"results/qc/fastq_screen/{sample}/{sample}_R2_screen.txt",
+		"results/qc/fastq_screen/{sample}/{sample}_R2_screen.png",
+		"results/qc/fastq_screen/{sample}/{sample}_R2_screen.html"
 	params:
 		conf = config["fastq_screen_conf"],
-		outdir = "samples/qc/fastq_screen/{sample}"
+		outdir = "results/qc/fastq_screen/{sample}"
 	conda:
 		"../envs/fastq_screen.yaml"
 	message: " -- Screening {wildcards.sample} --"
@@ -28,15 +28,15 @@ rule fastq_screen_controls:
 		r1 = "samples/controls/{sample}_R1.fastq.gz",
 		r2 = "samples/controls/{sample}_R2.fastq.gz"
 	output:
-		"samples/qc/fastq_screen/{sample}/{sample}_R1_screen.txt",
-		"samples/qc/fastq_screen/{sample}/{sample}_R1_screen.png",
-		"samples/qc/fastq_screen/{sample}/{sample}_R1_screen.html",
-		"samples/qc/fastq_screen/{sample}/{sample}_R2_screen.txt",
-		"samples/qc/fastq_screen/{sample}/{sample}_R2_screen.png",
-		"samples/qc/fastq_screen/{sample}/{sample}_R2_screen.html"
+		"results/qc/fastq_screen/{sample}/{sample}_R1_screen.txt",
+		"results/qc/fastq_screen/{sample}/{sample}_R1_screen.png",
+		"results/qc/fastq_screen/{sample}/{sample}_R1_screen.html",
+		"results/qc/fastq_screen/{sample}/{sample}_R2_screen.txt",
+		"results/qc/fastq_screen/{sample}/{sample}_R2_screen.png",
+		"results/qc/fastq_screen/{sample}/{sample}_R2_screen.html"
 	params:
 		conf = config["fastq_screen_conf"],
-		outdir = "samples/qc/fastq_screen/{sample}"
+		outdir = "results/qc/fastq_screen/{sample}"
 	conda:
 		"../envs/fastq_screen.yaml"
 	message: " -- Screening {wildcards.sample} --"
@@ -44,31 +44,6 @@ rule fastq_screen_controls:
 	threads: 16
 	shell:
 		"fastq_screen --aligner bowtie2 --threads {threads} --conf {params.conf} --outdir {params.outdir} {input.r1} {input.r2}"
-
-# library complexity
-rule preseq:
-	input:
-		"samples/bams/{sample}.mapped.dedup.sorted.bam"
-	output:
-		"samples/qc/preseq/preseq_{sample}.txt"
-	conda:
-		"../envs/preseq.yaml"
-	log:
-		"logs/preseq/{sample}.log"
-	shell:
-		"preseq c_curve -B -P -o {output} {input} > {log} 2>&1"
-
-rule preseq_lcextrap:
-	input:
-		"samples/bams/{sample}.mapped.dedup.sorted.bam"
-	output:
-		"samples/qc/preseq/lcextrap_{sample}.txt"
-	conda:
-		"../envs/preseq.yaml"
-	log:
-		"logs/preseq_lcextrap/{sample}.log"
-	shell:
-		"preseq lc_extrap -B -P -e 1000000000 -o {output} {input} > {log} 2>&1"
 
 # post-alignment QC -----------------------------------------------------
 rule frip_count:

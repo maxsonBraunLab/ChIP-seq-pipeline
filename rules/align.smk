@@ -79,6 +79,21 @@ rule makeTracks:
     shell:
         """scripts/makeTracks.sh -i {input} -o {output} -g {params.assembly} -e {params.ext}"""
 
+# count total aligned reads
+rule align_stats_1:
+    input:
+        "samples/bams/{sample}.sorted.bam"
+    output:
+        "samples/bams/stats/{sample}_tot_reads.txt"
+    conda:
+        "../envs/chip.yaml"
+    shell:
+        """
+        tot_reads=$(samtools view -c {input})
+        aligned_reads=$(samtools view -h {input} | awk '{{if ($3 != "*") {{print $0}} }}' | samtools view -c)
+        echo -e "{wildcards.sample}\n$tot_reads\n$aligned_reads" > {output}
+        """
+
 rule markdup:
     input:
         "samples/bams/{sample}.sorted.bam"
@@ -93,6 +108,19 @@ rule markdup:
     shell:
         "sambamba markdup -r -t {threads} {input} {output}"
 
+rule align_stats_2:
+    input:
+        rules.markdup.output[0]
+    output:
+        "samples/bams/stats/{sample}_uniq_reads.txt"
+    conda:
+        "../envs/chip.yaml"
+    shell:
+        """
+        uniq_reads=$(samtools view -c {input})
+        echo -e "{wildcards.sample}\n$uniq_reads" > {output}
+        """
+
 rule rm_unmapped:
     input:
         rules.markdup.output
@@ -102,3 +130,12 @@ rule rm_unmapped:
         "../envs/chip.yaml"
     shell:
         """samtools view -h {input} | awk '{{  if ($3 != "*") {{print $0}}  }}' | samtools view -bS > {output}; samtools index {output}"""
+
+# rule align_stats:
+#     input:
+#         tot = expand("samples/bams/stats/{sample}_tot_reads.txt", sample = SAMPLES),
+#         uniq = expand("samples/bams/stats/{sample}_uniq_reads.txt", sample = SAMPLES)
+#     output:
+#         "samples/bams/align_stats.txt"
+#     run:
+#         

@@ -1,7 +1,0 @@
-name: preseq
-channels:
-  - bioconda
-  - defaults
-  - anaconda
-dependencies:
-  - preseq==2.0.3

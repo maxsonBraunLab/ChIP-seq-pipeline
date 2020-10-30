@@ -46,3 +46,23 @@ rule de_stats:
 		header = "\t".join(['factor', 'cond1', 'cond2', 'tot_peaks', 'sig_peaks', 'sig_up', 'sig_down'])
 	shell:
 		"cat {input} | sort > {output}; sed -i '1i {params.header}' {output}"
+
+rule essential_report:
+	input:
+		consensus_stats = "samples/macs/consensus_stats.txt",
+		de_stats = "results/de/de_stats.txt"
+	output:
+		"results/essential_report.html"
+	conda:
+		"../envs/report.yaml"
+	params:
+		title = config["title"],
+		authors = config["authors"],
+		intro = config["intro"],
+		peak_md = config["samples"],
+		contrasts = config["contrasts"],
+		analysis = config["analysis"],
+		takeaways = config["takeaways"],
+		notes = config["notes"]
+	script:
+		"../scripts/essential_report.Rmd"

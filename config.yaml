@@ -31,3 +31,30 @@ linear_model:
 
 # chip screen + fisher --------------------------------------------------------
 chrom_sizes: /home/groups/MaxsonLab/indices/GRch38/hg38.chrom.sizes
+
+# essential reports -----------------------------------------------------------
+gen_report: yes # [yes, no]
+
+title: "GSK + quizartinib combo treatment with MOLM13 cells at 24 hours"
+authors:
+  - Dan Coleman
+  - Rowan Callahan
+  - Garth Kong
+  - Ted Braun
+  - Julia Maxson
+  - et al.
+
+intro: "We are looking to do some drug combination studies with GSK and Quizartinib to treat MOLM13 cells which have FLT3-ITD mutations."
+
+takeaways:
+  - "All samples look good with no obvious batch effect."
+  - "Consensus peaks looked okay. Number of consensus peaks per factor would be ranked: LSD1 > MYC >> RUNX."
+  - "Very few DE peaks for MYC and RUNX across all contrasts; LSD1 had about 50 DE peaks."
+
+notes: "We answered these questions, and look forward to answering more."
+
+analysis:
+  - "Align reads with bowtie1"
+  - "Make tracks + generate bigBed files, mark duplicates, remove unmapped reads"
+  - "Call peaks with MACS2 using bigBed files. Control sample is IgG split by condition and replicate."
+  - "Take consensus peaks with custom R script and generate"

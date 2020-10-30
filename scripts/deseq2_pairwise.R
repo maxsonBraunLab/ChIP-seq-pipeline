@@ -26,12 +26,9 @@ rownames(counts) <- dat$V4
 rownames(md) <- md$SampleID
 
 # deseq2 ----------------------------------------------------------------
-dds <- DESeqDataSetFromMatrix(
-	countData = as.matrix(counts),
-	colData = md,
-	design = ~ Condition)
+dds <- DESeqDataSetFromMatrix( countData = as.matrix(counts), colData = md, design = ~ Condition)
 
-dds <- DESeq(dds, parallel = parallel)
+dds <- DESeq(dds, parallel = snakemake@threads)
 res <- results(dds)
 
 # export deseq2-normalized counts ---------------------------------------
@@ -118,5 +115,7 @@ all_sig_intervals <- all_sig_intervals %>%
 	select(Chr, start, stop, V4) %>%
 	rename(V4 = "name")
 
-write.table(de_stats, snakemake@output[['stats']], quote = FALSE, sep = "\t", row.names = F, col.names = F)
+de_stats <- de_stats %>% arrange(cond1, cond2) %>% distinct()
+
+write.table(de_stats, snakemake@output[['stats']], quote = FALSE, sep = "\t", row.names = F, col.names = TRUE)
 write.table(all_sig_intervals, snakemake@output[['all_sig_intervals']], quote = FALSE, sep = "\t", row.names = F, col.names = F)
