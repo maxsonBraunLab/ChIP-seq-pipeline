@@ -166,7 +166,7 @@ $ snakemake -np --verbose
 Once your files are symbolically linked, you can submit the job to exacloud via your terminal window.
 
 ```bash
-$ sbatch submit_snakemake.sh
+$ snakemake -j 99 --use-conda --rerun-incomplete --latency-wait 60 --keep-going --profile ./slurm --cluster-config cluster.json
 ```
 
 To see how the job is running, look at your queue.
