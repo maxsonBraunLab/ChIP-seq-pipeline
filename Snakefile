@@ -72,8 +72,18 @@ for case in CASES:
 essential_report = []
 if config["gen_report"] == True: essential_report.append("results/essential_report.html"); message("Generating essential report")
 
-# custom analysis
+# custom analysis + chip_screen
 MERGED, = glob_wildcards("custom/bams/{sample}.mapped.dedup.sorted.bam")
+DB, CELL_LINE, = glob_wildcards("/home/groups/MaxsonLab/kongg/chip_seq/data/beds/{db}/{cell_line}/tf_chip.bed.gz")
+chip_screen = []
+if config["chip_screen"] == True:
+    message("Will report results of the ChIP-screener")
+    for factor in list(FACTORS):
+        for db, cell_line in zip(DB, CELL_LINE):
+            s = "/".join(["results", "chip_screen", db, cell_line, factor + "_screen.bed.gz"])
+            f = "/".join(["results", "chip_screen", db, cell_line, factor + "_screen.out"])
+            chip_screen.append(s)
+            chip_screen.append(f)
 
 # snakemake -j 99 --use-conda --rerun-incomplete --latency-wait 60 --keep-going --profile slurm --cluster-config cluster2.json
 
