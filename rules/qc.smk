@@ -82,6 +82,32 @@ rule frip_plot:
 			xaxis=dict(title='Samples'))
 		fig.write_html(str(output))
 
+rule chip_screen:
+	input:
+		factor_peaks = "samples/macs/{factor}_peaks.bed",
+		chip_db = "/home/groups/MaxsonLab/kongg/chip_seq/data/beds/{db}/{cell_line}/tf_chip.bed.gz"
+	output:
+		"results/chip_screen/{db}/{cell_line}/{factor}_screen.bed.gz"
+	conda:
+		"../envs/chip.yaml"
+	shell:
+		"bedtools intersect -wa -wb -f 0.50 -a {input.factor_peaks} -b {input.chip_db} | awk -F '[\t_]' '$4 ~ $12 || $12 ~ $4 {{print}}' | gzip > {output}"
+# use tab and "_" as delimiters, then query if either our antibody matches db antibody, or other way around.
+
+rule chip_fisher:
+	input:
+		factor_peaks = "samples/macs/{factor}_peaks.bed",
+		chip_db = "/home/groups/MaxsonLab/kongg/chip_seq/data/beds/{db}/{cell_line}/tf_chip.bed.gz"
+	output:
+		"results/chip_screen/{db}/{cell_line}/{factor}_screen.out"
+	params:
+		chrom_sizes = config["chrom_sizes"]
+	conda:
+		"../envs/chip.yaml"
+	shell:
+		"bedtools merge -i {input.chip_db} | bedtools fisher -f 0.50 -a {input.factor_peaks} -b stdin -g {params.chrom_sizes} > {output}"
+# merge all db intervals into one interval to reduce multiple intersects + account for different size db's.
+
 def get_control_bam(wildcards):
     return md.loc[(wildcards.sample),["Control_bam"]]
 
