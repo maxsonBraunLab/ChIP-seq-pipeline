@@ -108,25 +108,7 @@ rule all:
                 controls = CONTROLS_UNIQUE,
                 ext = ["png", "txt", "html"]),
         # essential report
-        essential_report,
-        # custom analysis -------------------------------------------------
-        # merge bam replicates + convert to bigwig + compute consensus peaks heatmaps + plot in one stacked plot.
-        # expand("custom/bams/{cond}_{factor}.mapped.dedup.sorted.bam", 
-        #     cond = set( [i.split("_")[0][:-1] for i in CASES] ), 
-        #     factor = set(contrasts.Factor) ),
-        # expand("custom/bigwigs/{sample}.bw", sample = MERGED),
-        # expand("custom/qc/computeMatrix_merged/{sample}_{factor}_matrix.{ext}", 
-        #     sample = [i.split("_")[0] for i in MERGED], 
-        #     factor = FACTORS, 
-        #     ext = ["gz", "txt"]),
-        # expand("custom/results/plotHeatmap/{sample}_{factor}_heatmap.png", 
-        #     sample = [i.split("_")[0] for i in MERGED],
-        #     factor = FACTORS),
-        # expand("custom/results/{factor}_heatmap.html",
-        #     factor = FACTORS),
-        # expand("custom/qc/computeMatrix_LSD1_DE/{sample}_LSD1_matrix.{ext}",
-        #     sample = [i.split("_")[0] for i in MERGED],
-        #     ext = ["gz", "txt"])
+        essential_report
 
 # workflow in this order
 include: "rules/align.smk"
