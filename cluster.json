@@ -1,77 +1,77 @@
 {
     "__default__" :
     {
-        "t" : "35:00:00",
-        "N" : 1,
+        "time" : "35:00:00",
+        "nodes" : 1,
         "partition" : "exacloud",
-        "J" : "{rule}.{wildcards}",
-        "o" : "logs/{rule}/{wildcards}_{rule}%j.out",
-        "e" : "logs/{rule}/{wildcards}_{rule}%j.err",
-        "c" : 4,
+        "job-name" : "{rule}.{wildcards}",
+        "output" : "logs/{rule}/{wildcards}_{rule}%j.out",
+        "error" : "logs/{rule}/{wildcards}_{rule}%j.err",
+        "cpus-per-task" : 4,
         "mem" : 45000
     },
      "mapReads_single_cases" :
     {
-        "J" : "mapReads_single_cases",
-        "o" : "logs/mapReads/mapReads_single_cases%j.out",
-        "e" : "logs/mapReads/mapReads_single_cases%j.err",
-        "c" : 12,
+        "job-name" : "mapReads_single_cases",
+        "output" : "logs/mapReads/mapReads_single_cases%j.out",
+        "error" : "logs/mapReads/mapReads_single_cases%j.err",
+        "cpus-per-task" : 12,
         "mem" : 64000
     },
      "mapReads_single_controls" :
     {
-        "J" : "mapReads_single_controls",
-        "o" : "logs/mapReads/mapReads_single_controls%j.out",
-        "e" : "logs/mapReads/mapReads_single_controls%j.err",
-        "c" : 12,
+        "job-name" : "mapReads_single_controls",
+        "output" : "logs/mapReads/mapReads_single_controls%j.out",
+        "error" : "logs/mapReads/mapReads_single_controls%j.err",
+        "cpus-per-task" : 12,
         "mem" : 64000
     },
      "mapReads_paired_cases" :
     {
-        "J" : "mapReads_paired_cases",
-        "o" : "logs/mapReads/mapReads_paired_cases%j.out",
-        "e" : "logs/mapReads/mapReads_paired_cases%j.err",
-        "c" : 12,
+        "job-name" : "mapReads_paired_cases",
+        "output" : "logs/mapReads/mapReads_paired_cases%j.out",
+        "error" : "logs/mapReads/mapReads_paired_cases%j.err",
+        "cpus-per-task" : 12,
         "mem" : 64000
     },
      "mapReads_paired_controls" :
     {
-        "J" : "mapReads_paired_controls",
-        "o" : "logs/mapReads/mapReads_paired_controls%j.out",
-        "e" : "logs/mapReads/mapReads_paired_controls%j.err",
-        "c" : 12,
+        "job-name" : "mapReads_paired_controls",
+        "output" : "logs/mapReads/mapReads_paired_controls%j.out",
+        "error" : "logs/mapReads/mapReads_paired_controls%j.err",
+        "cpus-per-task" : 12,
         "mem" : 64000
     },
      "makeTracks" :
     {
-        "J" : "makeTracks",
-        "o" : "logs/makeTracks/makeTracks%j.out",
-        "e" : "logs/makeTracks/makeTracks%j.err",
-        "c" : 4,
+        "job-name" : "makeTracks",
+        "output" : "logs/makeTracks/makeTracks%j.out",
+        "error" : "logs/makeTracks/makeTracks%j.err",
+        "cpus-per-task" : 4,
         "mem" : 45000
     },
      "normTracks" : 
     {
-        "J" : "normTracks",
-        "o" : "logs/normTracks/normTracks%j.out",
-        "e" : "logs/normTracks/normTracks%j.err",
-        "c" : 16,
+        "job-name" : "normTracks",
+        "output" : "logs/{rule}/{wildcards}_{rule}%j.out",
+        "error" : "logs/{rule}/{wildcards}_{rule}%j.err",
+        "cpus-per-task" : 8,
         "mem" : 45000
      },
      "bb2bed" :
     {
-        "J" : "bb2bed",
-        "o" : "logs/bb2bed/bb2bed%j.out",
-        "e" : "logs/bb2bed/bb2bed%j.err",
-        "c" : 4,
+        "job-name" : "bb2bed",
+        "output" : "logs/bb2bed/bb2bed%j.out",
+        "error" : "logs/bb2bed/bb2bed%j.err",
+        "cpus-per-task" : 4,
         "mem" : 45000
     },
      "call_peaks" :
     {
-        "J" : "call_peaks",
-        "o" : "logs/call_peaks/call_peaks%j.out",
-        "e" : "logs/call_peaks/call_peaks%j.err",
-        "c" : 12,
-        "mem" : 64000
+        "job-name" : "call_peaks",
+        "output" : "logs/call_peaks/call_peaks%j.out",
+        "error" : "logs/call_peaks/call_peaks%j.err",
+        "cpus-per-task" : 4,
+        "mem" : 45000
     }
 }

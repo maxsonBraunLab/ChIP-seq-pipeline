@@ -35,7 +35,7 @@ chrom_sizes: /home/groups/MaxsonLab/indices/GRch38/hg38.chrom.sizes
 # essential reports -----------------------------------------------------------
 gen_report: yes # [yes, no]
 
-title: "GSK + quizartinib combo treatment with MOLM13 cells at 24 hours"
+title: "GSK x Quiz treatment with MOLM13 cells at 24 hours"
 authors:
   - Dan Coleman
   - Rowan Callahan

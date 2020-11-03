@@ -37,7 +37,7 @@ rule consensus_peaks:
     output:
         all_peaks = "samples/macs/all_peaks.bed",
         consensus_per_factor = expand("samples/macs/{factor}_peaks.bed", factor = FACTORS),
-        consensus_stats = "samples/macs/consensus_stats.txt"
+        consensus_stats = "results/qc/consensus_stats.txt"
     params:
         present_in_number = config["n_intersects"],
         blacklist = config["blacklist"],

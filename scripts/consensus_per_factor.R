@@ -16,9 +16,8 @@ np_file <- args[1]
 blacklist_file <- args[2]
 presence_in_samples <- as.numeric(args[3]) # e.g. 2
 genome_name <- args[4]
-threads <- as.integer(args[5])
 
-options(srapply_fapply="parallel", mc.cores = threads)
+options(srapply_fapply="parallel", mc.cores = as.integer(args[5]))
 
 #This command reads in the merged broadnarrowpeak files and adds the information about the genome
 #we used 
@@ -99,7 +98,7 @@ Factors <- unique(filtered_peaks$factor)
 stats_catalog <- data.frame()
 
 for (f in Factors) {
-	# given all peaks, subset by factor, split by condition, count no. of overlaps between peaks per reps
+	# given all peaks df, we subset by factor, split by condition, count no. of overlaps between peaks per reps
 	outfile <- paste0('samples/macs/', f, '_peaks.bed')
 	print(paste("Finding consensus peak in >=", presence_in_samples, "number of replicates from factor", f))
 	temp_df <- filtered_peaks %>% filter(factor == f)
@@ -166,4 +165,4 @@ for (i in 1:nrow(stats_catalog)) {
 
 print("Consensus statistics")
 print(stats_catalog)
-fwrite(stats_catalog, "samples/macs/consensus_stats.txt", sep = "\t", quote = FALSE, )
+fwrite(stats_catalog, "results/qc/consensus_stats.txt", sep = "\t", quote = FALSE, )

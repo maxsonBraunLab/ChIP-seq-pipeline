@@ -1,25 +1,25 @@
-SampleID	Control	Control_bam	Peak_call
-M24C1_LSD1	samples/bed/M24C1_IgGC.bed	samples/bams/M24C1_IgGC.mapped.markdup.sorted.bam	narrow
-M24C1_MYC	samples/bed/M24C1_IgGC.bed	samples/bams/M24C1_IgGC.mapped.markdup.sorted.bam	narrow
-M24C1_RUNX	samples/bed/M24C1_IgGC.bed	samples/bams/M24C1_IgGC.mapped.markdup.sorted.bam	narrow
-M24C2_LSD1	samples/bed/M24C2_IgGC.bed	samples/bams/M24C2_IgGC.mapped.markdup.sorted.bam	narrow
-M24C2_MYC	samples/bed/M24C2_IgGC.bed	samples/bams/M24C2_IgGC.mapped.markdup.sorted.bam	narrow
-M24C2_RUNX	samples/bed/M24C2_IgGC.bed	samples/bams/M24C2_IgGC.mapped.markdup.sorted.bam	narrow
-M24D1_LSD1	samples/bed/M24D1_IgGC.bed	samples/bams/M24D1_IgGC.mapped.markdup.sorted.bam	narrow
-M24D1_MYC	samples/bed/M24D1_IgGC.bed	samples/bams/M24D1_IgGC.mapped.markdup.sorted.bam	narrow
-M24D1_RUNX	samples/bed/M24D1_IgGC.bed	samples/bams/M24D1_IgGC.mapped.markdup.sorted.bam	narrow
-M24D2_LSD1	samples/bed/M24D2_IgGC.bed	samples/bams/M24D2_IgGC.mapped.markdup.sorted.bam	narrow
-M24D2_MYC	samples/bed/M24D2_IgGC.bed	samples/bams/M24D2_IgGC.mapped.markdup.sorted.bam	narrow
-M24D2_RUNX	samples/bed/M24D2_IgGC.bed	samples/bams/M24D2_IgGC.mapped.markdup.sorted.bam	narrow
-M24G1_LSD1	samples/bed/M24G1_IgGC.bed	samples/bams/M24G1_IgGC.mapped.markdup.sorted.bam	narrow
-M24G1_MYC	samples/bed/M24G1_IgGC.bed	samples/bams/M24G1_IgGC.mapped.markdup.sorted.bam	narrow
-M24G1_RUNX	samples/bed/M24G1_IgGC.bed	samples/bams/M24G1_IgGC.mapped.markdup.sorted.bam	narrow
-M24G2_LSD1	samples/bed/M24G2_IgGC.bed	samples/bams/M24G2_IgGC.mapped.markdup.sorted.bam	narrow
-M24G2_MYC	samples/bed/M24G2_IgGC.bed	samples/bams/M24G2_IgGC.mapped.markdup.sorted.bam	narrow
-M24G2_RUNX	samples/bed/M24G2_IgGC.bed	samples/bams/M24G2_IgGC.mapped.markdup.sorted.bam	narrow
-M24Q1_LSD1	samples/bed/M24Q1_IgGC.bed	samples/bams/M24Q1_IgGC.mapped.markdup.sorted.bam	narrow
-M24Q1_MYC	samples/bed/M24Q1_IgGC.bed	samples/bams/M24Q1_IgGC.mapped.markdup.sorted.bam	narrow
-M24Q1_RUNX	samples/bed/M24Q1_IgGC.bed	samples/bams/M24Q1_IgGC.mapped.markdup.sorted.bam	narrow
-M24Q2_LSD1	samples/bed/M24Q2_IgGC.bed	samples/bams/M24Q2_IgGC.mapped.markdup.sorted.bam	narrow
-M24Q2_MYC	samples/bed/M24Q2_IgGC.bed	samples/bams/M24Q2_IgGC.mapped.markdup.sorted.bam	narrow
-M24Q2_RUNX	samples/bed/M24Q2_IgGC.bed	samples/bams/M24Q2_IgGC.mapped.markdup.sorted.bam	narrow
+SampleID	Control	Peak_call
+M24C1_LSD1	samples/bed/M24C1_IgGC.bed	narrow
+M24C1_MYC	samples/bed/M24C1_IgGC.bed	narrow
+M24C1_RUNX	samples/bed/M24C1_IgGC.bed	narrow
+M24C2_LSD1	samples/bed/M24C2_IgGC.bed	narrow
+M24C2_MYC	samples/bed/M24C2_IgGC.bed	narrow
+M24C2_RUNX	samples/bed/M24C2_IgGC.bed	narrow
+M24D1_LSD1	samples/bed/M24D1_IgGC.bed	narrow
+M24D1_MYC	samples/bed/M24D1_IgGC.bed	narrow
+M24D1_RUNX	samples/bed/M24D1_IgGC.bed	narrow
+M24D2_LSD1	samples/bed/M24D2_IgGC.bed	narrow
+M24D2_MYC	samples/bed/M24D2_IgGC.bed	narrow
+M24D2_RUNX	samples/bed/M24D2_IgGC.bed	narrow
+M24G1_LSD1	samples/bed/M24G1_IgGC.bed	narrow
+M24G1_MYC	samples/bed/M24G1_IgGC.bed	narrow
+M24G1_RUNX	samples/bed/M24G1_IgGC.bed	narrow
+M24G2_LSD1	samples/bed/M24G2_IgGC.bed	narrow
+M24G2_MYC	samples/bed/M24G2_IgGC.bed	narrow
+M24G2_RUNX	samples/bed/M24G2_IgGC.bed	narrow
+M24Q1_LSD1	samples/bed/M24Q1_IgGC.bed	narrow
+M24Q1_MYC	samples/bed/M24Q1_IgGC.bed	narrow
+M24Q1_RUNX	samples/bed/M24Q1_IgGC.bed	narrow
+M24Q2_LSD1	samples/bed/M24Q2_IgGC.bed	narrow
+M24Q2_MYC	samples/bed/M24Q2_IgGC.bed	narrow
+M24Q2_RUNX	samples/bed/M24Q2_IgGC.bed	narrow

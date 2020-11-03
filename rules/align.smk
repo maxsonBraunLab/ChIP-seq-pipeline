@@ -87,10 +87,11 @@ rule align_stats_1:
         "samples/bams/stats/{sample}_tot_reads.txt"
     conda:
         "../envs/chip.yaml"
+    threads: 4
     shell:
         """
-        tot_reads=$(samtools view -c {input})
-        aligned_reads=$(samtools view -h {input} | awk '{{if ($3 != "*") {{print $0}} }}' | samtools view -c)
+        tot_reads=$(samtools view -@ {threads} -c {input})
+        aligned_reads=$(samtools view -@ {threads} -h {input} | awk '{{if ($3 != "*") {{print $0}} }}' | samtools view -@ {threads} -c)
         echo -e "{wildcards.sample}\n$tot_reads\n$aligned_reads" > {output}
         """
 
@@ -106,7 +107,7 @@ rule markdup:
         "logs/markdup/{sample}.log"
     threads: 8
     shell:
-        "sambamba markdup -r -t {threads} {input} {output}"
+        "sambamba markdup -r -t {threads} {input} {output[0]}"
 
 rule align_stats_2:
     input:
@@ -115,15 +116,16 @@ rule align_stats_2:
         "samples/bams/stats/{sample}_uniq_reads.txt"
     conda:
         "../envs/chip.yaml"
+    threads: 4
     shell:
         """
-        uniq_reads=$(samtools view -c {input})
+        uniq_reads=$(samtools view -@ {threads} -c {input})
         echo -e "{wildcards.sample}\n$uniq_reads" > {output}
         """
 
 rule rm_unmapped:
     input:
-        rules.markdup.output
+        rules.markdup.output[0]
     output:
         "samples/bams/{sample}.mapped.dedup.sorted.bam"
     conda:
@@ -131,11 +133,24 @@ rule rm_unmapped:
     shell:
         """samtools view -h {input} | awk '{{  if ($3 != "*") {{print $0}}  }}' | samtools view -bS > {output}; samtools index {output}"""
 
-# rule align_stats:
-#     input:
-#         tot = expand("samples/bams/stats/{sample}_tot_reads.txt", sample = SAMPLES),
-#         uniq = expand("samples/bams/stats/{sample}_uniq_reads.txt", sample = SAMPLES)
-#     output:
-#         "samples/bams/align_stats.txt"
-#     run:
-#         
+rule align_stats:
+    input:
+        tot = expand("samples/bams/stats/{sample}_tot_reads.txt", sample = SAMPLES),
+        uniq = expand("samples/bams/stats/{sample}_uniq_reads.txt", sample = SAMPLES)
+    output:
+        "results/qc/align_stats.txt"
+    run:
+        tot_df = pd.concat([ pd.read_csv(i) for i in input.tot ], axis = 1)
+        uniq_df = pd.concat([ pd.read_csv(i) for i in input.uniq ], axis = 1)
+        all_df = tot_df.append(uniq_df, ignore_index=True)
+        all_df = all_df.rename(index = {0: "tot_reads", 1: "aligned_reads", 2: "uniq_reads"}).transpose()
+        # calculate align rate, duplicate reads, and duplicate rates per sample.
+        all_df['align_rate'] = all_df['aligned_reads'] / all_df['tot_reads']
+        all_df['dup_reads'] = all_df['tot_reads'] - all_df['uniq_reads'] # duplicates = total reads minus uniq reads.
+        all_df['dup_rate'] = (all_df['tot_reads'] - all_df['uniq_reads']) / all_df['tot_reads'] # duplicates = total reads minus uniq reads.
+        all_df = all_df[['tot_reads', 'aligned_reads', 'align_rate', 'uniq_reads', 'dup_reads', 'dup_rate']].sort_index()
+        # format table. end result is cols = [sample, factor, tot_reads, aligned_reads, align_rate, uniq_reads, dup_reads, dup_rate]
+        all_df['sample'] = all_df.index
+        all_df[['sample', 'factor']] = all_df['sample'].str.split("_", expand = True)
+        all_df = all_df[['sample', 'factor', 'tot_reads', 'aligned_reads', 'align_rate', 'uniq_reads', 'dup_reads', 'dup_rate']]
+        all_df.to_csv(str(output), sep = "\t")
