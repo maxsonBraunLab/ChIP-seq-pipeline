@@ -30,7 +30,8 @@ linear_model:
   ~ Condition
 
 # chip screen + fisher --------------------------------------------------------
-chrom_sizes: /home/groups/MaxsonLab/indices/GRch38/hg38.chrom.sizes
+chip_screen: no
+chrom_sizes: "/home/groups/MaxsonLab/indices/GRch38/hg38.sorted.chrom.sizes"
 
 # essential reports -----------------------------------------------------------
 gen_report: yes # [yes, no]
