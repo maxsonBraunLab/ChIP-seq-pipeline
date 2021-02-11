@@ -163,10 +163,10 @@ Do a dry-run of snakemake to ensure proper execution before submitting it to the
 $ snakemake -np --verbose
 ```
 
-Once your files are symbolically linked, you can submit the job to exacloud via your terminal window.
+To configure your [snakemake profile](https://snakemake.readthedocs.io/en/stable/executing/cli.html) for a SLURM system (required), copy the `slurm` folder to `~/.config/snakemake`, and delete the local copy. Once your files are symbolically linked, you can submit the job to exacloud via your terminal window.
 
 ```bash
-$ snakemake -j 99 --use-conda --rerun-incomplete --latency-wait 60 --keep-going --profile ./slurm --cluster-config cluster.json
+$ snakemake -j 99 --use-conda --rerun-incomplete --latency-wait 60 --keep-going --profile slurm --cluster-config cluster.yaml
 ```
 
 To see how the job is running, look at your queue.
@@ -175,7 +175,7 @@ To see how the job is running, look at your queue.
 $ squeue -u your_username
 ```
 
-Once you have finished the pipeline and custom analyses, you can generate a report via the `config.yaml` file by ticking the `gen_report` flag yes, filling out subsequent fields, and re-running SnakeMake again. 
+Once you have finished the pipeline, you can generate a report via the `config.yaml` file by ticking the `gen_report` flag yes, filling out subsequent fields, and re-running SnakeMake again.
 
 Methods
 ======================

@@ -72,8 +72,7 @@ for case in CASES:
 essential_report = []
 if config["gen_report"] == True: essential_report.append("results/essential_report.html"); message("Generating essential report")
 
-# custom analysis + chip_screen
-MERGED, = glob_wildcards("custom/bams/{sample}.mapped.dedup.sorted.bam")
+# ChIP-Screen
 DB, CELL_LINE, = glob_wildcards("/home/groups/MaxsonLab/kongg/chip_seq/data/beds/{db}/{cell_line}/tf_chip.bed.gz")
 chip_screen = []
 if config["chip_screen"] == True:
@@ -118,11 +117,11 @@ rule all:
                 controls = CONTROLS_UNIQUE,
                 ext = ["png", "txt", "html"]),
         # essential report
-        essential_report
+        essential_report,
+        chip_screen
 
 # workflow in this order
 include: "rules/align.smk"
 include: "rules/peaks.smk"
 include: "rules/qc.smk"
 include: "rules/deseq2_report.smk"
-include: "rules/custom.smk"
