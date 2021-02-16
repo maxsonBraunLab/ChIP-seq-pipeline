@@ -37,9 +37,8 @@ rule essential_report:
 	input:
 		# pipeline QC metrics
 		align_stats = "results/qc/align_stats.txt",
-		consensus_stats = "samples/macs/consensus_stats.txt",
-		de_stats = "results/de/de_stats.txt",
-		frip_folder = directory("samples/qc/frip")
+		consensus_stats = "results/qc/consensus_stats.txt",
+		de_stats = "results/de/de_stats.txt"
 	output:
 		"results/essential_report.html"
 	conda:
@@ -56,5 +55,6 @@ rule essential_report:
 		# config files
 		peak_md = config["samples"],
 		contrasts = config["contrasts"],
+		frip_folder = directory("samples/qc/frip")
 	script:
 		"../scripts/essential_report.Rmd"
