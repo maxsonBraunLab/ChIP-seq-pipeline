@@ -143,8 +143,8 @@ for (f in Factors) {
 	stats_catalog <- rbind(stats_catalog, stats_per_factor)
 }
 
-# collect fraction of reads in consensus catalog (FRCC) per rep per factor.
-for (i in 1:nrow(stats_catalog)) {
+# collect fraction of reads in consensus catalog (FRCC) per rep per factor. in parallel!
+FRCC <- mclapply(1:nrow(stats_catalog), function(i) {
 	# define input files
 	factor <- stats_catalog[i, "factor"]
 	rep <- stats_catalog[i, "rep"]
@@ -159,10 +159,13 @@ for (i in 1:nrow(stats_catalog)) {
 	reads_in_cc <- sum(counted$records)
 	total_reads <- countBam(bamFile, param = ScanBamParam(what = "qname"))$records
 	frcc <- reads_in_cc / total_reads * 100
-	stats_catalog[i, "%_reads_in_CC"] = frcc
-}
+	frcc
+}, mc.cores = as.integer(args[5]))
 
+names(FRCC) <- stats_catalog$rep
+stats_catalog <- cbind(stats_catalog, unlist(FRCC))
+stats_catalog <- stats_catalog %>% rename(`unlist(FRCC)`="%_reads_in_CC")
 
 print("Consensus statistics")
 print(stats_catalog)
-fwrite(stats_catalog, "results/qc/consensus_stats.txt", sep = "\t", quote = FALSE, )
+fwrite(stats_catalog, "results/qc/consensus_stats.txt", sep = "\t", quote = FALSE)
