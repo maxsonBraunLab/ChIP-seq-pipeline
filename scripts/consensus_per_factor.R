@@ -66,6 +66,7 @@ if (genome_name == "hg38") {
 			chr7=159345973,
 			chr8=145138636,
 			chr9=138394717,
+			chrM=16569, 
 			chrX=156040895,
 			chrY=57227415)
 } else if (genome_name == "mm10") {
@@ -88,6 +89,7 @@ if (genome_name == "hg38") {
 			chr7=145441459,
 			chr8=129401213,
 			chr9=124595110,
+			chrM=16299,
 			chrX=171031299,
 			chrY=91744698)
 }
